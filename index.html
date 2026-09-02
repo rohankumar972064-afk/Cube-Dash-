@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>CUBE DASH — Supabase Cloud</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#050b1b;color:#fff;font-family:Arial,sans-serif}
+:root{--p:#101b39;--p2:#14264b;--line:#294170;--blue:#147eea;--green:#20c84b;--gold:#f5b51b;--purple:#8a3df0;--orange:#f08a00;--red:#df3344;--muted:#aeb9d6}
+.app{max-width:520px;margin:auto;min-height:100vh;background:linear-gradient(180deg,#09152d,#050b1b);padding:10px 10px 88px}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 5px}.logo{font-weight:900;font-size:31px;line-height:.82;background:linear-gradient(90deg,#ff9d00,#ff3939,#14b8ff,#a545ff);-webkit-background-clip:text;color:transparent}.coins{background:#111d3e;border:1px solid var(--line);border-radius:20px;padding:9px 13px;font-weight:bold}
+.page{display:none}.page.active{display:block}.card{background:linear-gradient(145deg,#111e40,#0b1530);border:1px solid #2b4375;border-radius:17px;padding:15px;margin:10px 0;box-shadow:0 8px 25px #0004}
+h1{text-align:center;font-size:35px;margin:16px 0 8px}.sub{text-align:center;color:var(--muted);font-size:14px}.btn{width:100%;border:0;border-radius:11px;padding:14px;color:#fff;font-weight:800;margin:6px 0;background:#18315d}.green{background:linear-gradient(135deg,#2bd74d,#13a839)}.blue{background:#116fd2}.purple{background:#7935c9}.orange{background:#e27e00}.red{background:#c92e3e}.teal{background:#118e91}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.info{display:flex;align-items:center;gap:10px;background:#0a1430;border-radius:11px;padding:11px;margin:7px 0;color:#dce4ff}.info b{color:#fff}.demoAd{background:#f4b51a;color:#172033;border-radius:9px;padding:9px;margin-top:10px;text-align:center;font-weight:bold;border:1px solid #ffd75a}.demoAd small{display:block;font-weight:normal}.board{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;background:#060d20;padding:6px;border:2px solid #304673;border-radius:12px;max-width:410px;margin:12px auto}.cell{aspect-ratio:1;background:#101a32;border-radius:4px}.cell.filled{box-shadow:inset 0 1px 1px #fff7,inset 0 -2px 2px #0005}
+.gameStats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.gameStat{background:#0a1430;border-radius:9px;text-align:center;padding:8px}.gameStat small{color:var(--muted);display:block}.gameStat b{font-size:17px}.pieces{display:flex;gap:8px}.piece{height:75px;flex:1;background:#0b1530;border:1px solid #2b4070;border-radius:10px;display:flex;justify-content:center;align-items:center}.mini{display:grid;gap:2px}.mini i{width:16px;height:16px;border-radius:3px;display:block}.hint{text-align:center;color:#b9c4df;font-size:12px}.adbox{border:2px dashed #6175a9;border-radius:10px;text-align:center;padding:13px;margin:10px 0;color:#b7c2dd}.rewardBox{background:linear-gradient(145deg,#30200b,#151a2e);border:1px solid #c28d19;border-radius:15px;padding:15px;text-align:center}.rewardBox h2{margin:5px;color:#ffd044}.menuList button{text-align:left}.profileTop{text-align:center}.avatar{width:75px;height:75px;border-radius:50%;background:#27375b;display:inline-flex;align-items:center;justify-content:center;font-size:40px;border:2px solid #6d82b7}
+.form input,.form select{width:100%;padding:12px;background:#08122b;border:1px solid #304672;border-radius:9px;color:#fff;margin:5px 0}.form label{font-size:12px;color:#aeb9d6}.bonus{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.day{background:#0a1430;padding:9px 3px;text-align:center;border-radius:9px;border:1px solid #2b406d}.day b{display:block;color:#ffd044}.day.today{border-color:#2bd74d}.adminStat{display:grid;grid-template-columns:1fr 1fr;gap:7px}.adminStat div{background:#0a1430;padding:12px;border-radius:9px}.adminStat b{font-size:19px;display:block}.small{font-size:12px;color:var(--muted)}.settingRow{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#0a1430;border-radius:10px;margin:8px 0}.toggle{width:46px;height:25px}.back{background:none;color:#b8c6e5;padding:5px}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:16px;z-index:50}.modal.show{display:flex}.modalBox{max-width:420px;width:100%;background:#101b3b;border:1px solid #45609a;border-radius:17px;padding:20px;text-align:center}.modalBox h2{margin-top:0}.success{color:#52ed70}.rewardCoins{font-size:34px;color:#ffd044;font-weight:900}.nav{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);width:min(calc(100% - 20px),500px);z-index:40;background:#0d1934;border:1px solid #304672;border-radius:15px;padding:7px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:12px}.nav button{background:none;color:#b9c5df;border:0;padding:8px 2px;font-size:11px}.nav button.active{color:#55a8ff}
+@media(min-width:700px){body{padding:20px}.app{border:1px solid #233962;border-radius:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">CUBE<br>DASH</div><div style="text-align:right"><div class="coins">🪙 <span id="coinTop">0</span></div><div id="cloudStatus" class="small">Cloud offline</div></div></header>
+
+<section id="home" class="page active">
+<div class="card">
+<h1>BLOCK PUZZLE</h1><p class="sub">Place blocks • Complete rows/columns • Reach the target</p>
+<button class="btn green" onclick="startGame()">▶ START GAME</button>
+<div class="grid2"><button class="btn blue" onclick="show('profile')">👤 PROFILE</button><button class="btn purple" onclick="show('wallet')">💼 WALLET</button></div>
+<div class="grid2"><button class="btn orange" onclick="show('bonus')">🎁 DAILY BONUS</button><button class="btn" onclick="show('settings')">⚙ SETTINGS</button></div>
+<div class="info">🪙 <b>200 coins = ₹1</b></div>
+<div class="info">🎁 <b>7-day bonus: 20 → 100 coins</b></div>
+<div class="info">📶 <b>Basic game works offline</b></div>
+<div class="demoAd">🎬 DEMO AD <small>This is a demo advertisement</small></div>
+</div>
+<div class="card"><button class="btn" onclick="show('login')">🔐 USER LOGIN</button><button class="btn purple" onclick="show('adminLogin')">🛡 ADMIN LOGIN</button></div>
+</section>
+
+<section id="game" class="page">
+<button class="back" onclick="show('home')">← Home</button>
+<div class="gameStats"><div class="gameStat"><small>LEVEL</small><b id="level">1</b></div><div class="gameStat"><small>TARGET</small><b id="target">200</b></div><div class="gameStat"><small>TIME</small><b id="timer">02:30</b></div></div>
+<div class="card"><div class="gameStat"><small>SCORE</small><b id="score">0</b></div><div id="board" class="board"></div>
+<div class="pieces" id="pieces"></div><p class="hint">Press a block below, then tap a position on the board to drop it.</p>
+<div class="adbox">📺 REAL IN-GAME AD<br><small>Shown by the native AdMob SDK when the app bridge is enabled.</small></div></div>
+</section>
+
+<section id="profile" class="page"><button class="back" onclick="show('home')">← Home</button>
+<div class="card profileTop"><div class="avatar">👤</div><h2 id="profileName">Player123</h2><p class="small" id="profileEmail">Guest Player</p><p class="small" id="syncStatus">Local / offline mode</p><div class="info">🪙 Coins: <b id="profileCoins">0</b></div><div class="info">🏆 Best Score: <b id="best">0</b></div><div class="info">🎮 Level: <b id="profileLevel">1</b></div></div>
+<div class="card"><h3>✏️ EDIT PROFILE</h3><div class="form"><label>Display Name</label><input id="editProfileName" placeholder="Your name"><label>Email / Mobile (optional)</label><input id="editProfileContact" placeholder="email or mobile"></div><button class="btn blue" onclick="saveProfile()">SAVE PROFILE</button></div>
+<div class="card"><h3>🎁 REFER & EARN</h3><p class="small">Your referral code</p><div class="info"><b id="myReferralCode">CUBE0000</b></div><button class="btn green" onclick="copyReferralCode()">COPY REFERRAL CODE</button><div class="form"><label>Enter referral code</label><input id="referralInput" placeholder="Friend's referral code"></div><button class="btn purple" onclick="applyReferral()">APPLY REFERRAL CODE</button><p class="small" id="referralStatus"></p></div>
+<button class="btn blue" onclick="show('login')">LOGIN / ACCOUNT</button></section>
+
+<section id="wallet" class="page"><button class="back" onclick="show('home')">← Home</button><div class="card"><h2>💼 WALLET</h2><h1>🪙 <span id="walletCoins">0</span></h1><p class="sub">1 Rupee = <span id="walletCpr">200</span> Coins</p><div class="info">Minimum: ₹<span id="walletMin">100</span></div><div class="info">Maximum: ₹<span id="walletMax">1,000</span></div><div class="form"><label>Withdrawal method</label><select id="withdrawMethod" onchange="toggleWithdrawFields()"><option value="upi">UPI</option><option value="bank">Bank Account</option></select><div id="upiFields"><label>UPI ID</label><input id="upiId" placeholder="name@upi"><label>Account holder name</label><input id="upiName" placeholder="Full name"></div><div id="bankFields" style="display:none"><label>Account holder name</label><input id="bankName" placeholder="Full name"><label>Account number</label><input id="bankAccount" inputmode="numeric" placeholder="Account number"><label>IFSC code</label><input id="bankIfsc" placeholder="SBIN0000000"><label>Bank name</label><input id="bankBank" placeholder="Bank name"></div><label>Withdrawal amount (₹)</label><input id="withdrawAmt" type="number" min="100" max="1000" value="100"></div><button class="btn green" onclick="withdraw()">REQUEST WITHDRAWAL</button><button class="btn blue" onclick="renderWithdrawalHistory()">VIEW REQUEST HISTORY</button><div id="withdrawHistory"></div><p class="small">Withdrawal requests sync to Supabase when the user is logged in. Real payouts require a secure backend/Edge Function.</p></div></section>
+
+<section id="bonus" class="page"><button class="back" onclick="show('home')">← Home</button><div class="card"><h2>🎁 DAILY BONUS</h2><p class="sub">Claim once per day. After Day 7, the cycle repeats.</p><div class="bonus" id="bonusGrid"></div><button class="btn orange" onclick="claimBonus()">CLAIM TODAY'S BONUS</button><div class="rewardBox"><h2>WEEKLY FLOW</h2><div id="weeklyFlowText">20 → 30 → 40 → 50 → 60 → 80 → 100 🪙</div></div></div></section>
+
+<section id="settings" class="page"><button class="back" onclick="show('home')">← Home</button><div class="card"><h2>⚙ SETTINGS</h2>
+<div class="settingRow">🔊 Sound <input id="soundToggle" class="toggle" type="checkbox" onchange="saveAppSettings()"></div>
+<div class="settingRow">📳 Vibration <input id="vibrationToggle" class="toggle" type="checkbox" onchange="saveAppSettings()"></div>
+<div class="settingRow">🌙 Dark Game Mode <input id="darkToggle" class="toggle" type="checkbox" onchange="saveAppSettings()"></div>
+<button class="btn blue" onclick="show('supabaseConfig')">☁ SUPABASE CLOUD SETUP</button>
+<button class="btn" onclick="resetGameData()">🗑 RESET GAME DATA</button>
+<button class="btn red" onclick="logoutUser()">🚪 LOGOUT</button>
+<p class="small">Settings are saved in this browser. Cloud sync runs automatically when you are logged in.</p></div></section>
+
+<section id="login" class="page"><button class="back" onclick="show('home')">← Home</button><div class="card"><h2 id="authTitle">🔐 USER LOGIN</h2><p class="sub" id="authSubtitle">Login with your email and password</p><div class="form"><div id="signupNameWrap" style="display:none"><label>Display Name</label><input id="authName" type="text" placeholder="Your name" autocomplete="name"></div><label>Email</label><input id="authEmail" type="email" placeholder="you@example.com" autocomplete="email"><label>Password</label><input id="authPassword" type="password" placeholder="Minimum 6 characters" autocomplete="new-password"><div id="confirmPasswordWrap" style="display:none"><label>Confirm Password</label><input id="authPassword2" type="password" placeholder="Re-enter password" autocomplete="new-password"></div></div><button class="btn green" id="authPrimaryBtn" onclick="signInUser()">LOGIN</button><button class="btn blue" id="authSwitchBtn" onclick="toggleAuthMode()">CREATE NEW ACCOUNT</button><button class="btn" onclick="signOutUser()">🚪 LOGOUT</button><p class="small" id="authStatus">Already have an account? Login above.</p><div class="demoAd">🎬 DEMO AD <small>This is a demo advertisement</small></div></div></section>
+
+<section id="supabaseConfig" class="page"><button class="back" onclick="show('home')">← Home</button><div class="card"><h2>☁ CLOUD SETUP</h2><p class="small">Paste your Project URL and Publishable/Anon Key. Never use the Service Role key here.</p><div class="form"><label>Supabase Project URL</label><input id="sbUrl" placeholder="https://xxxxx.supabase.co"><label>Anon / Publishable Key</label><input id="sbKey" placeholder="eyJ..."></div><button class="btn green" onclick="saveSupabaseConfig()">CONNECT & SAVE</button><p class="small" id="sbConfigStatus"></p></div></section>
+
+<section id="adminLogin" class="page"><button class="back" onclick="show('home')">← Home</button><div class="card"><h2>🛡 ADMIN LOGIN</h2><p class="sub">Admin Panel Access</p><div class="form"><label>Admin Email</label><input id="adminId" type="email" placeholder="admin@example.com" autocomplete="username"><label>Password</label><input id="adminPass" type="password" placeholder="Your Supabase password" autocomplete="current-password"></div><button type="button" class="btn purple" id="adminLoginBtn" onclick="adminLogin()">LOGIN</button><p class="small">Admin login uses Supabase Auth + admin RLS permission.</p><div class="demoAd">🎬 DEMO AD <small>This is a demo advertisement</small></div></div></section>
+
+<section id="admin" class="page"><button class="back" onclick="show('home')">← Home</button><button class="btn red" onclick="adminLogout()">🚪 ADMIN LOGOUT</button><div class="card"><h2>🛡 ADMIN PANEL — LIVE DASHBOARD</h2>
+<div class="adminStat">
+  <div>👥<b id="dashUsers">—</b><span class="small">Real Users</span></div>
+  <div>🪙<b id="dashCoins">—</b><span class="small">Coins Held by Users</span></div>
+  <div>💰<b id="dashWithdrawals">—</b><span class="small">Approved Withdrawals</span></div>
+  <div>📺<b id="dashAds">—</b><span class="small">Tracked Ads Shown</span></div>
+</div>
+<button class="btn blue" type="button" onclick="loadRealDashboard()">↻ REFRESH LIVE DASHBOARD</button>
+<p class="small" id="dashStatus">Connect Supabase and run the dashboard SQL setup.</p>
+</div>
+<div class="card"><h3>📺 AD SETTINGS</h3><div class="form"><label>Start Ad Unit ID</label><input id="a1" placeholder="Demo Ad ID"><label>In-Game Ad Unit ID</label><input id="a2" placeholder="Demo Ad ID"><label>Game Over Ad Unit ID</label><input id="a3" placeholder="Demo Ad ID"><label>Reward Ad Unit ID</label><input id="a4" placeholder="ca-app-pub-.../rewarded"></div><p class="small">Real AdMob ads run through the Android/iOS native SDK bridge. Browser mode cannot display AdMob rewarded ads directly.</p><button class="btn green" onclick="saveAdmin()">SAVE AD SETTINGS</button></div>
+<div class="card"><h3>🪙 COIN SETTINGS</h3><div class="form">
+<label>Coins per ₹1</label><input id="cpr" type="number" value="200">
+<label>Reward Ad Coins</label><input id="rac" type="number" value="50">
+<label>Level Complete Minimum Coins</label><input id="rewardMin" type="number" min="1" value="20">
+<label>Level Complete Maximum Coins</label><input id="rewardMax" type="number" min="1" value="100">
+</div><button class="btn green" onclick="saveAdmin()">SAVE LEVEL REWARD SETTINGS</button><p class="small">Har level complete hone par reward is range ke andar randomly milega.</p></div>
+<div class="card"><h3>🎯 LEVEL TARGET & TIMER SETTINGS</h3><p class="small">Har level ke liye Target aur Timer manually add karo. Format: Level 1 = target 200, timer 150 seconds.</p><div class="form"><label>Level Number</label><input id="levelConfigNo" type="number" min="1" value="1"><label>Target Score</label><input id="levelConfigTarget" type="number" min="10" value="200"><label>Timer (seconds)</label><input id="levelConfigTimer" type="number" min="10" value="150"></div><button class="btn green" onclick="saveLevelConfig()">SAVE / UPDATE LEVEL</button><button class="btn blue" onclick="renderLevelConfigs()">REFRESH LEVEL SETTINGS</button><div id="levelConfigList"></div></div>
+<div class="card"><h3>🎁 WEEKLY COINS SETTINGS</h3><div class="form"><label>Day 1 Coins</label><input id="bonus1" type="number"><label>Day 2 Coins</label><input id="bonus2" type="number"><label>Day 3 Coins</label><input id="bonus3" type="number"><label>Day 4 Coins</label><input id="bonus4" type="number"><label>Day 5 Coins</label><input id="bonus5" type="number"><label>Day 6 Coins</label><input id="bonus6" type="number"><label>Day 7 Coins</label><input id="bonus7" type="number"></div><button class="btn green" onclick="saveWeeklyCoins()">SAVE WEEKLY COINS</button></div>
+<div class="card"><h3>🤝 REFERRAL COIN SETTINGS</h3><div class="form"><label>Referrer Coins</label><input id="referrerCoins" type="number" min="0" value="100"><label>New User Coins</label><input id="newUserReferralCoins" type="number" min="0" value="50"></div><button class="btn green" onclick="saveReferralSettings()">SAVE REFERRAL COINS</button><p class="small">Referral reward settings are synced through Supabase app settings.</p></div><div class="card"><h3>💰 WITHDRAWAL SETTINGS</h3><div class="form"><label>Minimum ₹</label><input id="minW" type="number" value="100"><label>Maximum ₹</label><input id="maxW" type="number" value="1000"><label>Daily Limit ₹</label><input id="dailyW" type="number" value="5000"></div><button class="btn green" onclick="saveAdmin()">SAVE</button></div>
+<div class="card"><h3>🏦 REAL PAYMENT / PAYOUT SETUP</h3><p class="small">Real payout ke liye provider/backend endpoint configure karo. HTML mein baad mein change karne ki zarurat nahi padegi.</p><div class="form"><label>Payout Mode</label><select id="paymentProvider"><option value="manual">Manual Approval Only</option><option value="custom">Custom Secure Payout API / Supabase Edge Function</option><option value="razorpayx">RazorpayX via Secure Backend</option><option value="cashfree">Cashfree Payout via Secure Backend</option></select><label>Secure Payout Endpoint URL</label><input id="paymentEndpoint" placeholder="https://YOUR_PROJECT.functions.supabase.co/payout"><label>Public Client ID / Key (optional)</label><input id="paymentPublicKey" placeholder="Public key only — never secret key"><label>Webhook / Callback URL (optional)</label><input id="paymentWebhook" placeholder="https://your-domain.com/payment-webhook"><label>Test Mode</label><select id="paymentTestMode"><option value="true">ON — Test</option><option value="false">OFF — Live</option></select></div><button class="btn green" onclick="savePaymentConfig()">SAVE PAYMENT SETUP</button><button class="btn blue" onclick="testPaymentEndpoint()">TEST ENDPOINT</button><p class="small" id="paymentStatus">Not configured.</p><p class="small">🔒 Never paste Razorpay/Cashfree secret key, Supabase Service Role key, or bank secret into HTML. Keep secrets in Supabase Edge Function environment variables.</p></div>
+<div class="card"><h3>💳 WITHDRAWAL REQUESTS</h3><button class="btn blue" onclick="refreshWithdrawalRequests()">🔄 REFRESH REQUESTS</button><p class="small">Supabase connected requests appear here. Use secure payout endpoint for real automatic payments.</p><div id="withdrawRequests"></div><button class="btn blue" onclick="renderWithdrawRequests()">REFRESH REQUESTS</button></div><div class="card"><h3>🎁 WEEKLY BONUS SETTINGS</h3><div class="bonus" id="adminBonus"></div><p class="small">Default: 20, 30, 40, 50, 60, 80, 100 coins.</p></div>
+</section>
+
+<div id="modal" class="modal"><div class="modalBox" id="modalBox"></div></div>
+<div id="toast" class="modal" style="background:transparent;align-items:flex-end;pointer-events:none"><div id="toastBox" style="background:#111d3e;border:1px solid #40598d;padding:11px 16px;border-radius:10px"></div></div>
+<nav class="nav">
+<button onclick="show('home')">🏠<br>HOME</button><button onclick="show('profile')">👤<br>PROFILE</button><button onclick="show('wallet')">💼<br>WALLET</button><button onclick="show('settings')">⚙<br>SETTINGS</button>
+</nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ======================================================
+// 🔴 SUPABASE CONNECTION SETTINGS
+// Paste your Project URL and Publishable/Anon Key below.
+// Never paste the Service Role key into this HTML file.
+// ======================================================
+let SUPABASE_URL = localStorage.getItem('cubeSupabaseUrl') || 'PASTE_YOUR_SUPABASE_PROJECT_URL_HERE';
+let SUPABASE_ANON_KEY = localStorage.getItem('cubeSupabaseAnonKey') || 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
+
+let supabaseClient = null;
+
+async function initSupabase(){
+  const validUrl=SUPABASE_URL&&!SUPABASE_URL.includes('PASTE_YOUR')&&SUPABASE_URL.startsWith('https://');
+  const validKey=SUPABASE_ANON_KEY&&!SUPABASE_ANON_KEY.includes('PASTE_YOUR');
+  if(validUrl&&validKey&&window.supabase){
+    try{
+      supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+      if(!window.__cubeAuthListener){
+        window.__cubeAuthListener=true;
+        supabaseClient.auth.onAuthStateChange((event,session)=>{
+          if(session) setTimeout(()=>syncFromCloud(session.user),0);
+          else setSyncStatus('Logged out');
+        });
+      }
+      const {data:{session}}=await supabaseClient.auth.getSession();
+      if(session) await syncFromCloud(session.user);
+      return true;
+    }catch(err){
+      console.error('Supabase setup error:',err);
+      setSyncStatus('Supabase connection error');
+    }
+  }
+  return false;
+}
+function setCloudStatus(t){const e=document.getElementById('cloudStatus');if(e)e.textContent=t}
+function setSyncStatus(t){
+  const e=document.getElementById('syncStatus');
+  if(e)e.textContent=t;
+}
+async function ensureProfile(user){
+  if(!supabaseClient||!user)return null;
+  const name=(user.user_metadata?.display_name||user.email?.split('@')[0]||'Player').slice(0,60);
+  const {data,error}=await supabaseClient.from('profiles').upsert(
+    {id:user.id,username:name},
+    {onConflict:'id'}
+  ).select().single();
+  if(error){ console.warn('Profile sync:',error.message); return null; }
+  if(data){
+    profile.name=data.username||name;
+    profile.contact=user.email||'Guest Player';
+    if(data.referral_code)profile.referralCode=data.referral_code;
+    saveLocalOnly();
+  }
+  return data;
+}
+async function syncFromCloud(user){
+  if(!supabaseClient||!user)return;
+  setSyncStatus('☁ Syncing online…');
+  const data=await ensureProfile(user);
+  if(!data){
+    update();
+    setSyncStatus('☁ Profile sync error — check profiles RLS');
+    return;
+  }
+
+  // Primary cloud progress from profiles.
+  S.coins=Number(data.coins)||0;
+  S.best=Number(data.best_score)||0;
+  S.level=Math.max(1,Number(data.current_level)||1);
+  S.score=0;
+
+  // Also read game_data when that table is available.
+  try{
+    const {data:gd,error:gdError}=await supabaseClient
+      .from('game_data').select('*').eq('user_id',user.id).maybeSingle();
+    if(!gdError && gd){
+      S.coins=Number(gd.coins ?? S.coins)||0;
+      S.best=Number(gd.best_score ?? S.best)||0;
+      S.level=Math.max(1,Number(gd.current_level ?? S.level)||1);
+    }
+  }catch(e){ console.warn('game_data read skipped',e); }
+
+  if(data.referral_code)profile.referralCode=data.referral_code;
+  saveLocalOnly();
+  await loadCloudPublicData();
+  update();
+  setCloudStatus('☁ Online');
+  setSyncStatus('☁ Online sync enabled');
+}
+
+function saveLocalOnly(){
+  localStorage.setItem('cubeDash',JSON.stringify(S));
+  localStorage.setItem('cubeProfile',JSON.stringify(profile));
+  localStorage.setItem('cubeCfg',JSON.stringify(cfg));
+  localStorage.setItem('cubeWeeklyBonus',JSON.stringify(weeklyBonus));
+  localStorage.setItem('cubeLevelConfigs',JSON.stringify(levelConfigs));
+}
+
+let syncTimer=null;
+async function syncToCloud(){
+  if(!supabaseClient)return;
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  if(!user)return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(async()=>{
+    const payload={
+      username:(profile.name||user.email?.split('@')[0]||'Player').slice(0,60),
+      coins:Number(S.coins)||0,
+      best_score:Number(S.best)||0,
+      current_level:Math.max(1,Number(S.level)||1),
+      referral_code:profile.referralCode||null
+    };
+
+    const {error}=await supabaseClient.from('profiles').upsert(
+      {id:user.id,...payload},{onConflict:'id'}
+    );
+
+    if(error){
+      console.warn('Profile cloud sync:',error.message);
+      setSyncStatus('Cloud sync error — check profiles RLS');
+      return;
+    }
+
+    // Keep the existing game_data table updated too.
+    try{
+      let gdPayload={
+        user_id:user.id,
+        coins:Number(S.coins)||0,
+        best_score:Number(S.best)||0,
+        current_level:Math.max(1,Number(S.level)||1)
+      };
+      let {error:gdError}=await supabaseClient.from('game_data')
+        .upsert(gdPayload,{onConflict:'user_id'});
+      if(gdError){
+        // Fallback for a schema that only contains user_id, coins and best_score.
+        ({error:gdError}=await supabaseClient.from('game_data')
+          .upsert({
+            user_id:user.id,
+            coins:Number(S.coins)||0,
+            best_score:Number(S.best)||0
+          },{onConflict:'user_id'}));
+      }
+      if(gdError)console.warn('game_data sync:',gdError.message);
+    }catch(e){ console.warn('game_data sync skipped',e); }
+
+    setSyncStatus('☁ Saved online');
+  },250);
+}
+
+// Loads admin-controlled values for every logged-in app user.
+async function loadCloudPublicData(){
+  if(!supabaseClient)return false;
+  let loaded=false;
+
+  try{
+    const {data:wb,error:wbError}=await supabaseClient
+      .from('weekly_bonus').select('day_number,coins').order('day_number');
+    if(wbError){
+      console.warn('Weekly bonus read:',wbError.message);
+    }else if(wb && wb.length){
+      weeklyBonus=[20,30,40,50,60,80,100];
+      wb.forEach(r=>{
+        const d=Number(r.day_number);
+        if(d>=1 && d<=7)weeklyBonus[d-1]=Number(r.coins)||0;
+      });
+      loaded=true;
+    }
+
+    const {data:row,error:settingsError}=await supabaseClient
+      .from('app_settings').select('*').eq('id',1).maybeSingle();
+
+    if(settingsError){
+      console.warn('App settings read:',settingsError.message);
+    }else if(row){
+      cfg.cpr=Number(row.coins_per_rupee ?? cfg.cpr)||cfg.cpr;
+      cfg.rac=Number(row.reward_ad_coins ?? cfg.rac)||cfg.rac;
+      cfg.rewardMin=Number(row.reward_min ?? cfg.rewardMin)||cfg.rewardMin;
+      cfg.rewardMax=Number(row.reward_max ?? cfg.rewardMax)||cfg.rewardMax;
+      cfg.minW=Number(row.minimum_withdrawal ?? cfg.minW)||cfg.minW;
+      cfg.maxW=Number(row.maximum_withdrawal ?? cfg.maxW)||cfg.maxW;
+      cfg.dailyW=Number(row.daily_withdrawal_limit ?? cfg.dailyW)||cfg.dailyW;
+      cfg.referrerCoins=Number(row.referrer_coins ?? cfg.referrerCoins ?? 100);
+      cfg.newUserReferralCoins=Number(row.new_user_referral_coins ?? cfg.newUserReferralCoins ?? 50);
+      cfg.adStart=row.ad_start ?? cfg.adStart ?? '';
+      cfg.adInGame=row.ad_ingame ?? cfg.adInGame ?? '';
+      cfg.adGameOver=row.ad_gameover ?? cfg.adGameOver ?? '';
+      cfg.adReward=row.ad_reward ?? cfg.adReward ?? '';
+      loaded=true;
+    }
+
+    const {data:lv,error:lvError}=await supabaseClient
+      .from('game_levels').select('level_number,target_score,timer_seconds').order('level_number');
+    if(lvError){
+      console.warn('Game levels read:',lvError.message);
+    }else if(lv && lv.length){
+      levelConfigs={};
+      lv.forEach(r=>{
+        levelConfigs[Number(r.level_number)]={
+          target:Number(r.target_score),
+          timer:Number(r.timer_seconds)
+        };
+      });
+      loaded=true;
+    }
+
+    saveLocalOnly();
+    renderBonus();
+    renderAdminBonus();
+    loadAdminFields();
+    loadWeeklyAdmin();
+    loadReferralAdmin();
+    syncWalletSettings();
+
+    if(loaded){
+      setSyncStatus('☁ Online settings synced');
+      setCloudStatus('☁ Online');
+    }
+    return loaded;
+  }catch(e){
+    console.warn('Public cloud settings load:',e);
+    setSyncStatus('Cloud settings error');
+    return false;
+  }
+}
+
+let authMode='login';
+function toggleAuthMode(){
+  authMode=authMode==='login'?'signup':'login';
+  const signup=authMode==='signup';
+  document.getElementById('authTitle').textContent=signup?'📝 CREATE ACCOUNT':'🔐 USER LOGIN';
+  document.getElementById('authSubtitle').textContent=signup?'Create your Cube Dash account':'Login with your email and password';
+  document.getElementById('signupNameWrap').style.display=signup?'block':'none';
+  document.getElementById('confirmPasswordWrap').style.display=signup?'block':'none';
+  document.getElementById('authPassword').autocomplete=signup?'new-password':'current-password';
+  document.getElementById('authPrimaryBtn').textContent=signup?'SIGN UP':'LOGIN';
+  document.getElementById('authPrimaryBtn').onclick=signup?signUpUser:signInUser;
+  document.getElementById('authSwitchBtn').textContent=signup?'← BACK TO LOGIN':'CREATE NEW ACCOUNT';
+  document.getElementById('authStatus').textContent=signup?'Use a valid email and a password of at least 6 characters.':'Already have an account? Login above.';
+}
+async function signUpUser(){
+  if(!supabaseClient)return toast('Supabase connect karo first');
+  const name=document.getElementById('authName').value.trim();
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  const password2=document.getElementById('authPassword2').value;
+  if(!name)return toast('Display name enter karo');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return toast('Valid email enter karo');
+  if(password.length<6)return toast('Password minimum 6 characters ka hona chahiye');
+  if(password!==password2)return toast('Passwords match nahi karte');
+  const {data,error}=await supabaseClient.auth.signUp({
+    email,password,data:{display_name:name}
+  });
+  if(error)return toast(error.message);
+  if(data.user){
+    await ensureProfile(data.user);
+    // Profile is created/synced by ensureProfile(). Game progress is stored in profiles.
+  }
+  document.getElementById('authStatus').textContent=data.session
+    ? '✅ Account created. You are now logged in.'
+    : '✅ Account created. Please check your email to confirm your account.';
+  toast(data.session?'Account created successfully':'Check your email to confirm');
+  if(data.session){ await syncFromCloud(data.user); show('home'); }
+}
+async function signInUser(){
+  if(!supabaseClient)return toast('Supabase connect karo first');
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error)return toast(error.message);
+  await syncFromCloud(data.user);
+  setCloudStatus('☁ Online');
+  toast('Login successful');
+  show('home');
+}
+async function signOutUser(){
+  if(supabaseClient)await supabaseClient.auth.signOut();
+  profile.contact='Guest Player';
+  saveLocalOnly();
+  setSyncStatus('Logged out'); setCloudStatus('Cloud offline');
+  toast('Logged out');
+  show('home');
+}
+async function saveSupabaseConfig(){
+  const u=document.getElementById('sbUrl').value.trim();
+  const k=document.getElementById('sbKey').value.trim();
+  if(!u.startsWith('https://')||!k)return toast('Project URL aur Anon/Publishable key required');
+  localStorage.setItem('cubeSupabaseUrl',u);
+  localStorage.setItem('cubeSupabaseAnonKey',k);
+  SUPABASE_URL=u;
+  SUPABASE_ANON_KEY=k;
+  if(await initSupabase()){
+    document.getElementById('sbConfigStatus').textContent='Connected. Session check + sync active.';
+    toast('Supabase connected');
+  }else toast('Connection failed — URL/key check karo');
+}
+function loadSupabaseConfig(){
+  const u=document.getElementById('sbUrl'),k=document.getElementById('sbKey');
+  if(u)u.value=SUPABASE_URL.includes('PASTE_YOUR')?'':SUPABASE_URL;
+  if(k)k.value=SUPABASE_ANON_KEY.includes('PASTE_YOUR')?'':SUPABASE_ANON_KEY;
+}
+
+
+const bonus=[20,30,40,50,60,80,100];
+let S=JSON.parse(localStorage.getItem('cubeDash')||'null')||{coins:0,best:0,bonusDay:0,lastBonus:'',level:1,score:0};
+let cfg=JSON.parse(localStorage.getItem('cubeCfg')||'null')||{cpr:200,rac:50,minW:100,maxW:1000,dailyW:5000,rewardMin:20,rewardMax:100};
+let withdrawals=JSON.parse(localStorage.getItem('cubeWithdrawals')||'[]');
+let levelConfigs=JSON.parse(localStorage.getItem('cubeLevelConfigs')||'{}');
+let weeklyBonus=JSON.parse(localStorage.getItem('cubeWeeklyBonus')||'null')||[20,30,40,50,60,80,100];
+let profile=JSON.parse(localStorage.getItem('cubeProfile')||'null')||{name:'Player123',contact:'Guest Player',referralCode:'CUBE'+Math.random().toString(36).slice(2,6).toUpperCase(),referralUsed:false};
+let appSettings=JSON.parse(localStorage.getItem('cubeAppSettings')||'null')||{sound:true,vibration:true,dark:false};
+let paymentConfig=JSON.parse(localStorage.getItem('cubePaymentConfig')||'null')||{provider:'manual',endpoint:'',publicKey:'',webhook:'',testMode:true};
+let board=Array(64).fill(0),pieces=[],selected=-1,timer=null,timeLeft=150;
+const colors=['#f59e0b','#1677e8','#16b64a','#ef3b2d','#8b45e8','#f97316','#10b8c8'];
+const shapes=[[[0,0]],[[0,0],[0,1]],[[0,0],[1,0]],[[0,0],[0,1],[0,2]],[[0,0],[1,0],[2,0]],[[0,0],[0,1],[1,0],[1,1]],[[0,0],[0,1],[1,1]],[[0,0],[1,0],[1,1]],[[0,0],[0,1],[1,0],[2,0]]];
+function save(){localStorage.setItem('cubeDash',JSON.stringify(S));localStorage.setItem('cubeCfg',JSON.stringify(cfg));localStorage.setItem('cubeWithdrawals',JSON.stringify(withdrawals));
+localStorage.setItem('cubeLevelConfigs',JSON.stringify(levelConfigs));
+localStorage.setItem('cubeWeeklyBonus',JSON.stringify(weeklyBonus));
+localStorage.setItem('cubeProfile',JSON.stringify(profile));
+localStorage.setItem('cubeAppSettings',JSON.stringify(appSettings));update();syncToCloud()}
+function update(){['coinTop','profileCoins','walletCoins'].forEach(id=>{let e=document.getElementById(id);if(e)e.textContent=S.coins});let b=document.getElementById('best'),sc=document.getElementById('score'),lv=document.getElementById('level'),tg=document.getElementById('target');if(b)b.textContent=S.best;if(sc)sc.textContent=S.score;if(lv)lv.textContent=S.level;if(tg)tg.textContent=S.levelTarget;let pn=document.getElementById('profileName'),pe=document.getElementById('profileEmail'),pl=document.getElementById('profileLevel'),rc=document.getElementById('myReferralCode');if(pn)pn.textContent=profile.name;if(pe)pe.textContent=profile.contact;if(pl)pl.textContent=S.level;if(rc)rc.textContent=profile.referralCode}
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');if(['home','bonus','wallet','game'].includes(id))loadCloudPublicData();if(id==='bonus')renderBonus();if(id==='admin'){loadAdminFields();renderAdminBonus();renderWithdrawRequests();loadWeeklyAdmin();loadReferralAdmin();loadPaymentConfig();renderLevelConfigs();loadCloudAdminData();loadRealDashboard()}if(id==='wallet'){syncWalletSettings();renderWithdrawalHistory()}if(id==='profile'){loadProfileForm()}if(id==='settings'){loadAppSettings()}if(id==='login'){if(authMode!=='login')toggleAuthMode()}if(id==='supabaseConfig'){loadSupabaseConfig()}update()}
+function toast(t){toastBox.textContent=t;document.getElementById('toast').classList.add('show');setTimeout(()=>document.getElementById('toast').classList.remove('show'),1500)}
+function modal(x){modalBox.innerHTML=x;document.getElementById('modal').classList.add('show')}function closeModal(){document.getElementById('modal').classList.remove('show')}
+function hasNativeAdBridge(){
+  return !!(window.Android && typeof window.Android.showAd==='function');
+}
+function showRealAd(type){
+  return new Promise(resolve=>{
+    const unit={start:cfg.adStart,ingame:cfg.adInGame,gameover:cfg.adGameOver,reward:cfg.adReward}[type]||'';
+    if(!hasNativeAdBridge())return resolve(false);
+    let done=false;
+    const finish=ok=>{if(done)return;done=true;window.__cubeAdResult=null;resolve(!!ok)};
+    window.__cubeAdResult=finish;
+    try{
+      const result=window.Android.showAd(String(type),String(unit));
+      if(result===true)finish(true);
+    }catch(e){console.warn('Native ad bridge:',e);finish(false)}
+    setTimeout(()=>finish(false),45000);
+  });
+}
+window.cubeAdFinished=function(completed){
+  if(typeof window.__cubeAdResult==='function')window.__cubeAdResult(!!completed);
+};
+
+async function startGame(){
+  const shown=await showRealAd('start');
+  if(!shown){
+    modal(`<h2>📺 START AD</h2><p>Real AdMob ad is not available in this browser.</p><p class="small">Open the Android/iOS build with the native AdMob bridge enabled.</p><button class="btn green" onclick="closeModal();beginGame()">CONTINUE</button>`);
+    return;
+  }
+  beginGame();
+}
+
+function beginGame(){
+  S.score=0;board=Array(64).fill(0);S.level=Math.max(1,S.level);
+  newPieces();show('game');startTimer();renderBoard();update();
+}
+function startTimer(){
+  clearInterval(timer);
+  const targetValue=S.levelTarget;
+  timeLeft=Number(levelConfigs[S.level]?.timer)||Math.max(90,150+Math.ceil(Math.max(0,targetValue-200)/150)*30);
+  timer=setInterval(()=>{timeLeft--;renderTimer();if(timeLeft<=0){clearInterval(timer);finishGame('TIME UP')}},1000);
+  renderTimer();
+}
+function renderTimer(){let m=Math.floor(timeLeft/60),s=timeLeft%60;timerEl=document.getElementById('timer');timerEl.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
+function newPieces(){pieces=[randomShape()];selected=0;renderPieces()}
+function randomShape(){return shapes[Math.floor(Math.random()*shapes.length)]}
+function renderBoard(){let b=document.getElementById('board');b.innerHTML='';board.forEach((v,i)=>{let c=document.createElement('div');c.className='cell'+(v?' filled':'');if(v)c.style.background=v;c.onclick=()=>drop(i);b.appendChild(c)})}
+function renderPieces(){let p=document.getElementById('pieces');p.innerHTML='';pieces.forEach((s,n)=>{let q=document.createElement('div');q.className='piece';q.style.outline='3px solid #ffd044';let h=Math.max(...s.map(a=>a[0]))+1,w=Math.max(...s.map(a=>a[1]))+1,m=document.createElement('div');m.className='mini';m.style.gridTemplateColumns=`repeat(${w},16px)`;for(let y=0;y<h;y++)for(let x=0;x<w;x++){let i=document.createElement('i');if(s.some(a=>a[0]===y&&a[1]===x))i.style.background=colors[n%colors.length];else i.style.visibility='hidden';m.appendChild(i)}q.appendChild(m);p.appendChild(q)})}
+function can(s,i){let r=Math.floor(i/8),c=i%8;return s.every(([y,x])=>r+y<8&&c+x<8&&!board[(r+y)*8+c+x])}
+function drop(i){if(selected<0)return toast('Pehle block select karo');let s=pieces[selected];if(!can(s,i))return toast('Block yahan fit nahi hoga');let r=Math.floor(i/8),c=i%8,col=colors[selected%colors.length];s.forEach(([y,x])=>board[(r+y)*8+c+x]=col);S.score+=s.length*10;clearLines();pieces.splice(selected,1);selected=0;if(!pieces.length)newPieces();renderBoard();renderPieces();update();if(S.score>=S.levelTarget){finishGame('TARGET COMPLETE')}else if(!pieces.some(s=>Array.from({length:64},(_,i)=>can(s,i)).some(Boolean)))finishGame('NO SPACE')}
+function clearLines(){let n=0,clear=[];for(let r=0;r<8;r++)if([...Array(8)].every((_,c)=>board[r*8+c]))clear.push(...Array.from({length:8},(_,c)=>r*8+c));for(let c=0;c<8;c++)if([...Array(8)].every((_,r)=>board[r*8+c]))clear.push(...Array.from({length:8},(_,r)=>r*8+c));[...new Set(clear)].forEach(i=>{board[i]=0;n++});if(n){S.score+=n*25;toast('Line clear! +score')}}
+Object.defineProperty(S,'levelTarget',{get(){return Number(levelConfigs[S.level]?.target)||200+(S.level-1)*150}})
+async function finishGame(reason){
+  clearInterval(timer);
+  trackAdEvent('level_complete');
+  if(S.score>S.best)S.best=S.score;
+  let min=Math.max(1,Number(cfg.rewardMin)||20),max=Math.max(min,Number(cfg.rewardMax)||100);
+  let reward=Math.floor(Math.random()*(max-min+1))+min;
+  S.coins+=reward;save();
+  const shown=await showRealAd('gameover');
+  if(!shown){
+    modal(`<h2>📺 LEVEL COMPLETE</h2><p>Real AdMob ad is not available in this browser.</p><button class="btn green" onclick="showLevelResult('${reason}',${reward})">CONTINUE</button>`);
+    return;
+  }
+  showLevelResult(reason,reward);
+}
+
+function showLevelResult(reason,reward){
+  modal(`<h2 class="success">🎉 ${reason}</h2><p>Level ${S.level} result</p><p>Score: <b>${S.score}</b> / Target: <b>${S.levelTarget}</b></p><div class="rewardCoins">🪙 +${reward}</div><p>Admin reward range se random coins mile.</p><button class="btn green" onclick="closeModal();S.level++;startGame()">NEXT LEVEL</button><button class="btn orange" onclick="closeModal();watchAd()">WATCH AD +${cfg.rac} COINS</button><button class="btn blue" onclick="closeModal();show('home')">HOME</button>`);
+}
+async function watchAd(){
+  if(!supabaseClient)return toast('Login + Supabase required for rewarded ads');
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  if(!user)return toast('Please login first');
+  const shown=await showRealAd('reward');
+  if(!shown)return toast('Rewarded Ad available only in the native app');
+  try{
+    const {data,error}=await supabaseClient.rpc('claim_reward_ad');
+    if(error)throw error;
+    const reward=Number(data?.coins ?? data?.reward_coins ?? cfg.rac)||0;
+    if(reward<=0)throw new Error('Server returned no reward');
+    await syncFromCloud(user);
+    trackAdEvent('reward');
+    modal(`<h2 class="success">🎁 REWARD AD COMPLETE</h2><p>Verified reward added.</p><div class="rewardCoins">🪙 +${reward}</div><button class="btn green" onclick="closeModal()">COLLECT REWARD</button>`);
+  }catch(e){
+    console.error('Reward ad claim:',e);
+    toast('Reward verification failed: '+(e.message||e));
+  }
+}
+
+function renderBonus(){
+  let e=document.getElementById('bonusGrid');
+  if(e){
+    e.innerHTML='';
+    weeklyBonus.forEach((v,i)=>e.innerHTML+=
+      `<div class="day ${i===S.bonusDay?'today':''}"><small>DAY ${i+1}</small><b>${v}🪙</b></div>`
+    );
+  }
+  const flow=document.getElementById('weeklyFlowText');
+  if(flow)flow.textContent=weeklyBonus.map(v=>`${v}`).join(' → ')+' 🪙';
+}
+
+async function claimBonus(){
+  if(!supabaseClient)return toast('Supabase connect karo first');
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  if(!user)return toast('Daily bonus claim karne ke liye login karo');
+  try{
+    const {data,error}=await supabaseClient.rpc('claim_daily_bonus');
+    if(error)throw error;
+    const r=Array.isArray(data)?data[0]:data;
+    const reward=Number(r?.coins ?? r?.reward_coins ?? 0);
+    const dayNumber=Number(r?.day_number ?? ((S.bonusDay%7)+1));
+    if(reward<=0)throw new Error('Server returned no bonus reward');
+    await syncFromCloud(user);
+    S.lastBonus=new Date().toISOString().slice(0,10);
+    S.bonusDay=(dayNumber%7);
+    saveLocalOnly();
+    renderBonus();
+    modal(`<h2>🎁 DAILY BONUS</h2><p>Day ${dayNumber} claimed</p><div class="rewardCoins">🪙 +${reward}</div><p class="small">Claim verified by Supabase.</p><button class="btn green" onclick="closeModal()">DONE</button>`);
+  }catch(e){
+    console.error('Daily bonus claim:',e);
+    const msg=String(e.message||e);
+    if(/already|duplicate|unique/i.test(msg))return toast('Aaj ka bonus already claimed');
+    toast('Bonus claim failed: '+msg);
+  }
+}
+
+function toggleWithdrawFields(){let m=document.getElementById('withdrawMethod').value;document.getElementById('upiFields').style.display=m==='upi'?'block':'none';document.getElementById('bankFields').style.display=m==='bank'?'block':'none'}
+function syncWalletSettings(){let c=document.getElementById('walletCpr'),mi=document.getElementById('walletMin'),ma=document.getElementById('walletMax'),wa=document.getElementById('withdrawAmt');if(c)c.textContent=cfg.cpr;if(mi)mi.textContent=cfg.minW;if(ma)ma.textContent=cfg.maxW;if(wa){wa.min=cfg.minW;wa.max=cfg.maxW}}
+function mask(v){v=String(v||'');return v.length<5?'••••':'••••'+v.slice(-4)}
+async function withdraw(){
+  if(!supabaseClient)return toast('Supabase connection not configured');
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  if(!user)return toast('Withdrawal ke liye login karo');
+  let a=Number(document.getElementById('withdrawAmt').value),need=a*cfg.cpr,m=document.getElementById('withdrawMethod').value,payout;
+  if(!Number.isFinite(a)||a<=0)return toast('Enter valid amount');
+  if(a<cfg.minW||a>cfg.maxW)return toast(`Allowed ₹${cfg.minW} - ₹${cfg.maxW}`);
+  if(m==='upi'){
+    let id=document.getElementById('upiId').value.trim(),name=document.getElementById('upiName').value.trim();
+    if(!name||!id.includes('@'))return toast('Valid UPI ID and name required');
+    payout={method:'UPI',name,upi:id};
+  }else{
+    let name=document.getElementById('bankName').value.trim(),acc=document.getElementById('bankAccount').value.replace(/\s/g,''),ifsc=document.getElementById('bankIfsc').value.trim().toUpperCase(),bank=document.getElementById('bankBank').value.trim();
+    if(!name||!acc||!ifsc||!bank)return toast('Complete all bank details');
+    if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc))return toast('Enter valid IFSC code');
+    payout={method:'Bank',name,account:acc,ifsc,bank};
+  }
+  try{
+    const {data,error}=await supabaseClient.rpc('create_withdrawal',{
+      p_amount:a,p_method:payout.method,p_account_name:payout.name,p_upi_id:payout.upi||null,
+      p_bank_account:payout.account||null,p_ifsc_code:payout.ifsc||null,p_bank_name:payout.bank||null
+    });
+    if(error)throw error;
+    const r=Array.isArray(data)?data[0]:data;
+    if(!r?.id)throw new Error('Withdrawal was not created');
+    const record={id:r.id,amount:Number(r.amount||a),coins:Number(r.coins_used||need),status:r.status||'Pending',createdAt:r.created_at||new Date().toISOString(),payout};
+    withdrawals.unshift(record);
+    await syncFromCloud(user);
+    renderWithdrawalHistory();
+    modal(`<h2 class="success">REQUEST CREATED</h2><p>₹${record.amount} withdrawal request submitted.</p><p>Status: <b>${record.status}</b></p><button class="btn green" onclick="closeModal()">OK</button>`);
+  }catch(e){
+    console.error('Withdrawal:',e);
+    toast('Withdrawal request failed: '+(e.message||e));
+  }
+}
+
+function renderWithdrawalHistory(){let e=document.getElementById('withdrawHistory');if(!e)return;if(!withdrawals.length){e.innerHTML='<p class="small">No withdrawal requests yet.</p>';return}e.innerHTML='<h3>Recent Requests</h3>'+withdrawals.slice(0,10).map(r=>`<div class="info">💸 <span><b>₹${r.amount}</b><br><small>${r.payout.method} • ${r.status}<br>${r.createdAt}</small></span></div>`).join('')}
+function renderWithdrawRequests(){let e=document.getElementById('withdrawRequests');if(!e)return;if(!withdrawals.length){e.innerHTML='<p class="small">No requests found yet.</p>';return}e.innerHTML=withdrawals.map(r=>{let d=r.payout.method==='UPI'?`${r.payout.name}<br>UPI: ${mask(r.payout.upi)}`:`${r.payout.name}<br>A/C: ${mask(r.payout.account)} • ${r.payout.ifsc}<br>${r.payout.bank}`;return `<div class="card" style="margin:8px 0"><b>${r.id} — ₹${r.amount}</b><p class="small">${d}<br>${r.createdAt}<br>Status: <b>${r.status}</b></p>${r.status==='Pending'?`<div class="grid2"><button class="btn green" onclick="updateWithdrawal('${r.id}','Approved')">APPROVE</button><button class="btn red" onclick="updateWithdrawal('${r.id}','Rejected')">REJECT + REFUND</button></div>`:''}</div>`}).join('')}
+async function updateWithdrawal(id,status){
+  if(!(await requireAdmin()))return toast('Admin permission missing in Supabase');
+  let r=withdrawals.find(x=>String(x.id)===String(id));
+  if(!r||r.status!=='Pending')return;
+  try{
+    if(status==='Approved' && paymentConfig.provider!=='manual'){
+      const ok=await processRealPayout(r);
+      if(!ok)return;
+    }
+    const {data,error}=await supabaseClient.rpc('admin_set_withdrawal_status',{p_withdrawal_id:id,p_status:status});
+    if(error)throw error;
+    const result=Array.isArray(data)?data[0]:data;
+    r.status=result?.status||status;
+    await refreshWithdrawalRequests();
+    renderWithdrawRequests();renderWithdrawalHistory();
+    toast(r.status==='Approved'?(paymentConfig.provider==='manual'?'Request approved (manual payout)':'Payment sent successfully'):'Request rejected and coins refunded');
+  }catch(e){
+    console.error('Withdrawal status:',e);
+    toast('Status update failed: '+(e.message||e));
+  }
+}
+
+function loadPaymentConfig(){
+  const a=document.getElementById('paymentProvider'),b=document.getElementById('paymentEndpoint'),c=document.getElementById('paymentPublicKey'),d=document.getElementById('paymentWebhook'),e=document.getElementById('paymentTestMode'),st=document.getElementById('paymentStatus');
+  if(a)a.value=paymentConfig.provider||'manual';if(b)b.value=paymentConfig.endpoint||'';if(c)c.value=paymentConfig.publicKey||'';if(d)d.value=paymentConfig.webhook||'';if(e)e.value=String(paymentConfig.testMode!==false);if(st)st.textContent=paymentConfig.endpoint?'Configured: '+paymentConfig.provider:'Manual approval mode active';
+}
+function savePaymentConfig(){
+  paymentConfig={provider:document.getElementById('paymentProvider').value,endpoint:document.getElementById('paymentEndpoint').value.trim(),publicKey:document.getElementById('paymentPublicKey').value.trim(),webhook:document.getElementById('paymentWebhook').value.trim(),testMode:document.getElementById('paymentTestMode').value==='true'};
+  if(paymentConfig.provider!=='manual' && !/^https:\/\//i.test(paymentConfig.endpoint))return toast('Secure HTTPS payout endpoint required');
+  localStorage.setItem('cubePaymentConfig',JSON.stringify(paymentConfig));
+  const st=document.getElementById('paymentStatus');if(st)st.textContent='Saved on this device only. Provider: '+paymentConfig.provider;
+  toast('Payment setup saved');
+}
+async function testPaymentEndpoint(){
+  savePaymentConfig();
+  if(paymentConfig.provider==='manual')return toast('Manual mode selected — no API call required');
+  if(!paymentConfig.endpoint)return toast('Payout endpoint required');
+  try{
+    const {data:{session}}=supabaseClient?await supabaseClient.auth.getSession():{data:{session:null}};
+    const res=await fetch(paymentConfig.endpoint,{method:'POST',headers:{'Content-Type':'application/json',...(session?.access_token?{Authorization:'Bearer '+session.access_token}:{}),...(paymentConfig.publicKey?{'X-Public-Key':paymentConfig.publicKey}:{})},body:JSON.stringify({action:'health_check',test_mode:paymentConfig.testMode})});
+    const text=await res.text();if(!res.ok)throw new Error(text||('HTTP '+res.status));
+    toast('Endpoint reachable');document.getElementById('paymentStatus').textContent='Endpoint test successful: '+text.slice(0,120);
+  }catch(e){toast('Endpoint test failed: '+e.message);document.getElementById('paymentStatus').textContent='Test failed: '+e.message;}
+}
+async function processRealPayout(r){
+  if(!paymentConfig.endpoint){toast('Payout endpoint configure karo');return false;}
+  try{
+    const {data:{session}}=supabaseClient?await supabaseClient.auth.getSession():{data:{session:null}};
+    const body={action:'payout',provider:paymentConfig.provider,test_mode:paymentConfig.testMode,withdrawal_id:r.id,amount:Number(r.amount),currency:'INR',method:r.payout.method,payout:r.payout,webhook:paymentConfig.webhook||null};
+    const res=await fetch(paymentConfig.endpoint,{method:'POST',headers:{'Content-Type':'application/json',...(session?.access_token?{Authorization:'Bearer '+session.access_token}:{}),...(paymentConfig.publicKey?{'X-Public-Key':paymentConfig.publicKey}:{})},body:JSON.stringify(body)});
+    const text=await res.text();let data;try{data=JSON.parse(text)}catch{data={raw:text}};
+    if(!res.ok || data?.success===false)throw new Error(data?.error||text||('HTTP '+res.status));
+    return true;
+  }catch(e){toast('Real payout failed: '+e.message);return false;}
+}
+function demoLogin(){toast('Demo user login successful');show('home')}
+async function verifyAdminPermission(user){
+  if(!user||!supabaseClient)return false;
+  const {data,error}=await supabaseClient.from('profiles').select('is_admin').eq('id',user.id).maybeSingle();
+  if(error){console.warn('Admin permission check:',error.message);return false}
+  return data?.is_admin===true;
+}
+async function requireAdmin(){
+  if(!supabaseClient)return false;
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  return !!user && await verifyAdminPermission(user);
+}
+async function adminLogin(){
+  const id=(document.getElementById('adminId')?.value||'').trim();
+  const pass=(document.getElementById('adminPass')?.value||'').trim();
+  if(!supabaseClient)return toast('Supabase connection not configured');
+  if(!id||!pass)return toast('Admin email and password required');
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email:id,password:pass});
+  if(error)return toast(error.message);
+  if(!(await verifyAdminPermission(data.user))){await supabaseClient.auth.signOut();return toast('This account is not an admin');}
+  setCloudStatus('☁ Admin online');setTimeout(loadRealDashboard,300);
+  await loadCloudAdminData();
+  show('admin');
+  toast('Admin login successful');
+}
+async function adminLogout(){if(supabaseClient)await supabaseClient.auth.signOut();setCloudStatus('Cloud offline');show('home');toast('Admin logged out')}
+async function saveAdmin(){
+  cfg.cpr=Number(document.getElementById('cpr').value)||200;
+  cfg.rac=Number(document.getElementById('rac').value)||50;
+  cfg.rewardMin=Math.max(1,Number(document.getElementById('rewardMin').value)||20);
+  cfg.rewardMax=Math.max(cfg.rewardMin,Number(document.getElementById('rewardMax').value)||100);
+  cfg.minW=Number(document.getElementById('minW').value)||100;
+  cfg.maxW=Math.max(cfg.minW,Number(document.getElementById('maxW').value)||1000);
+  cfg.dailyW=Math.max(cfg.maxW,Number(document.getElementById('dailyW').value)||5000);
+  cfg.adStart=document.getElementById('a1')?.value||'';
+  cfg.adInGame=document.getElementById('a2')?.value||'';
+  cfg.adGameOver=document.getElementById('a3')?.value||'';
+  cfg.adReward=document.getElementById('a4')?.value||'';
+
+  if(!(await requireAdmin()))return toast('Admin permission missing in Supabase');
+
+  const payload={
+    id:1,
+    coins_per_rupee:cfg.cpr,
+    reward_ad_coins:cfg.rac,
+    reward_min:cfg.rewardMin,
+    reward_max:cfg.rewardMax,
+    minimum_withdrawal:cfg.minW,
+    maximum_withdrawal:cfg.maxW,
+    daily_withdrawal_limit:cfg.dailyW,
+    referrer_coins:Number(cfg.referrerCoins??100),
+    new_user_referral_coins:Number(cfg.newUserReferralCoins??50),
+    ad_start:cfg.adStart,
+    ad_ingame:cfg.adInGame,
+    ad_gameover:cfg.adGameOver,
+    ad_reward:cfg.adReward
+  };
+
+  const {error}=await supabaseClient.from('app_settings').upsert(payload,{onConflict:'id'});
+  if(error)return toast('Settings save failed: '+error.message);
+
+  saveLocalOnly();
+  setCloudStatus('☁ Settings synced');
+  toast('All settings saved to Supabase');
+  await loadCloudPublicData();
+}
+function loadAdminFields(){let c=document.getElementById('cpr'),r=document.getElementById('rac'),mi=document.getElementById('minW'),ma=document.getElementById('maxW'),d=document.getElementById('dailyW');if(c)c.value=cfg.cpr;if(r)r.value=cfg.rac;if(mi)mi.value=cfg.minW;if(ma)ma.value=cfg.maxW;if(d)d.value=cfg.dailyW;let rmin=document.getElementById('rewardMin'),rmax=document.getElementById('rewardMax');if(rmin)rmin.value=cfg.rewardMin||20;if(rmax)rmax.value=cfg.rewardMax||100}
+function renderAdminBonus(){let e=document.getElementById('adminBonus');e.innerHTML='';weeklyBonus.forEach((v,i)=>e.innerHTML+=`<div class="day"><small>DAY ${i+1}</small><b>${v}🪙</b></div>`)}
+
+async function saveLevelConfig(){
+  const n=Number(document.getElementById('levelConfigNo').value),t=Number(document.getElementById('levelConfigTarget').value),tm=Number(document.getElementById('levelConfigTimer').value);
+  if(!n||!t||!tm)return toast('Enter valid level settings');
+  if(!(await requireAdmin()))return toast('Admin permission missing in Supabase');
+  const {error}=await supabaseClient.from('game_levels').upsert({level_number:n,target_score:t,timer_seconds:tm},{onConflict:'level_number'});
+  if(error)return toast('Level save failed: '+error.message);
+  levelConfigs[n]={target:t,timer:tm};saveLocalOnly();renderLevelConfigs();toast('Level '+n+' saved to Supabase');
+}
+function renderLevelConfigs(){
+  let e=document.getElementById('levelConfigList');
+  if(!e)return;
+  let keys=Object.keys(levelConfigs).sort((a,b)=>a-b);
+  e.innerHTML=keys.length?keys.map(k=>`<div class="info">Level <b>${k}</b> — Target: <b>${levelConfigs[k].target}</b> — Timer: <b>${levelConfigs[k].timer}s</b><button class="btn red" style="width:auto;margin-left:auto;padding:7px" onclick="deleteLevelConfig(${k})">DELETE</button></div>`).join(''):'<p class="small">No manual levels saved. Default automatic target/timer will be used.</p>';
+  const n=document.getElementById('levelConfigNo');
+  const t=document.getElementById('levelConfigTarget');
+  const tm=document.getElementById('levelConfigTimer');
+  const k=n?String(Number(n.value)||1):'1';
+  if(levelConfigs[k]){
+    if(t)t.value=levelConfigs[k].target;
+    if(tm)tm.value=levelConfigs[k].timer;
+  }
+}
+async function deleteLevelConfig(n){
+  if(!(await requireAdmin()))return toast('Admin permission missing in Supabase');
+  const {error}=await supabaseClient.from('game_levels').delete().eq('level_number',n);
+  if(error)return toast('Level delete failed: '+error.message);
+  delete levelConfigs[n];saveLocalOnly();renderLevelConfigs();toast('Level deleted from Supabase');
+}
+function loadWeeklyAdmin(){for(let i=0;i<7;i++){let e=document.getElementById('bonus'+(i+1));if(e)e.value=weeklyBonus[i]}}
+async function saveWeeklyCoins(){
+  if(!(await requireAdmin()))return toast('Admin permission missing in Supabase');
+  const a=[];
+  for(let i=1;i<=7;i++)a.push(Math.max(0,Number(document.getElementById('bonus'+i).value)||0));
+
+  for(let i=1;i<=7;i++){
+    const {error}=await supabaseClient.from('weekly_bonus').upsert(
+      {day_number:i,coins:a[i-1]},
+      {onConflict:'day_number'}
+    );
+    if(error)return toast('Weekly bonus save failed: '+error.message);
+  }
+
+  weeklyBonus=a;
+  saveLocalOnly();
+  renderBonus();
+  renderAdminBonus();
+
+  const ok=await loadCloudPublicData();
+  toast(ok?'Weekly coins saved and synced':'Weekly coins saved, but public read policy is missing');
+}
+function loadReferralAdmin(){let a=document.getElementById('referrerCoins'),b=document.getElementById('newUserReferralCoins');if(a)a.value=cfg.referrerCoins??100;if(b)b.value=cfg.newUserReferralCoins??50}
+async function saveReferralSettings(){
+  if(!(await requireAdmin()))return toast('Admin permission missing in Supabase');
+  cfg.referrerCoins=Math.max(0,Number(document.getElementById('referrerCoins').value)||0);
+  cfg.newUserReferralCoins=Math.max(0,Number(document.getElementById('newUserReferralCoins').value)||0);
+  saveLocalOnly();
+  const {error}=await supabaseClient.from('app_settings').upsert({
+    id:1,
+    coins_per_rupee:Number(cfg.cpr)||200,
+    reward_ad_coins:Number(cfg.rac)||50,
+    minimum_withdrawal:Number(cfg.minW)||100,
+    maximum_withdrawal:Number(cfg.maxW)||1000,
+    daily_withdrawal_limit:Number(cfg.dailyW)||5000,
+    referrer_coins:cfg.referrerCoins,
+    new_user_referral_coins:cfg.newUserReferralCoins
+  },{onConflict:'id'});
+  if(error)return toast('Referral save failed: '+error.message);
+  toast('Referral settings saved successfully');
+}
+async function refreshWithdrawalRequests(){
+  if(!supabaseClient)return toast('Supabase connection not configured');
+  if(!(await requireAdmin()))return toast('Admin permission missing in Supabase');
+  const {data,error}=await supabaseClient.from('withdrawals').select('*').order('created_at',{ascending:false});
+  if(error)return toast('Withdrawal refresh failed: '+error.message);
+  withdrawals=(data||[]).map(r=>({
+    id:r.id,amount:Number(r.amount),coins:Number(r.coins_used),status:r.status,
+    createdAt:r.created_at,payout:{
+      method:r.method,
+      name:r.account_name,
+      upi:r.upi_id,
+      account:r.bank_account,
+      ifsc:r.ifsc_code,
+      bank:r.bank_name
+    }
+  }));
+  localStorage.setItem('cubeWithdrawals',JSON.stringify(withdrawals));
+  renderWithdrawRequests();
+  toast('Withdrawal requests refreshed');
+}
+
+
+function setDashStatus(t){
+  const e=document.getElementById('dashStatus');
+  if(e)e.textContent=t;
+}
+function setDashValue(id,value){
+  const e=document.getElementById(id);
+  if(e)e.textContent=value;
+}
+async function loadRealDashboard(){
+  if(!supabaseClient){
+    setDashStatus('Supabase is not connected.');
+    return;
+  }
+  setDashStatus('Loading real Supabase data…');
+  try{
+    const {data:{user}}=await supabaseClient.auth.getUser();
+    if(!user){
+      setDashStatus('Please login as admin first.');
+      return;
+    }
+    const ok=await verifyAdminPermission(user);
+    if(!ok){
+      setDashStatus('Admin permission missing: profiles.is_admin must be true.');
+      return;
+    }
+
+    const {data,error}=await supabaseClient.rpc('admin_dashboard_stats');
+    if(error){
+      setDashStatus('Dashboard error: '+error.message);
+      return;
+    }
+
+    const d=Array.isArray(data)?data[0]:data;
+    if(!d){
+      setDashStatus('No dashboard data returned.');
+      return;
+    }
+
+    setDashValue('dashUsers',Number(d.total_users||0).toLocaleString());
+    setDashValue('dashCoins',Number(d.total_coins||0).toLocaleString());
+    setDashValue('dashWithdrawals','₹'+Number(d.total_withdrawals||0).toLocaleString());
+    setDashValue('dashAds',Number(d.total_ads||0).toLocaleString());
+    setDashStatus('● LIVE from Supabase • Updated '+new Date().toLocaleTimeString());
+  }catch(e){
+    console.warn('Live dashboard error:',e);
+    setDashStatus('Dashboard error: '+e.message);
+  }
+}
+
+// Tracks an in-app ad display. This is an app-side count.
+// For production AdMob reporting, trigger this only after the real SDK confirms an impression.
+async function trackAdEvent(adType){
+  if(!supabaseClient)return;
+  try{
+    const {data:{user}}=await supabaseClient.auth.getUser();
+    if(!user)return;
+    const {error}=await supabaseClient.from('ad_events').insert({
+      user_id:user.id,
+      ad_type:String(adType||'unknown')
+    });
+    if(error)console.warn('Ad event tracking:',error.message);
+  }catch(e){
+    console.warn('Ad event tracking skipped:',e);
+  }
+}
+
+async function loadCloudAdminData(){
+  if(!supabaseClient)return;
+  try{
+    const {data:lv,error:lvError}=await supabaseClient.from('game_levels').select('level_number,target_score,timer_seconds').order('level_number');
+    if(lvError)console.warn('Level settings load failed:',lvError.message);
+    if(lv){
+      levelConfigs={};
+      lv.forEach(r=>levelConfigs[Number(r.level_number)]={target:Number(r.target_score),timer:Number(r.timer_seconds)});
+      localStorage.setItem('cubeLevelConfigs',JSON.stringify(levelConfigs));
+    }
+
+    const {data:wb,error:wbError}=await supabaseClient.from('weekly_bonus').select('day_number,coins').order('day_number');
+    if(wbError)console.warn('Weekly bonus load failed:',wbError.message);
+    if(wb){
+      weeklyBonus=[20,30,40,50,60,80,100];
+      wb.forEach(r=>{const d=Number(r.day_number);if(d>=1&&d<=7)weeklyBonus[d-1]=Number(r.coins)});
+      localStorage.setItem('cubeWeeklyBonus',JSON.stringify(weeklyBonus));
+    }
+
+    const {data:row,error:settingsError}=await supabaseClient.from('app_settings').select('*').eq('id',1).maybeSingle();
+    if(settingsError)console.warn('App settings load failed:',settingsError.message);
+    if(row){
+      cfg.cpr=Number(row.coins_per_rupee)||cfg.cpr;
+      cfg.rac=Number(row.reward_ad_coins)||cfg.rac;
+      cfg.minW=Number(row.minimum_withdrawal)||cfg.minW;
+      cfg.maxW=Number(row.maximum_withdrawal)||cfg.maxW;
+      cfg.dailyW=Number(row.daily_withdrawal_limit)||cfg.dailyW;
+      cfg.referrerCoins=Number(row.referrer_coins??cfg.referrerCoins??100);
+      cfg.newUserReferralCoins=Number(row.new_user_referral_coins??cfg.newUserReferralCoins??50);
+      const gameOnly=JSON.parse(localStorage.getItem('cubeGameOnlySettings')||'{}');
+      cfg.rewardMin=Number(gameOnly.rewardMin)||cfg.rewardMin;
+      cfg.rewardMax=Number(gameOnly.rewardMax)||cfg.rewardMax;
+      cfg.adStart=gameOnly.adStart||cfg.adStart||'';
+      cfg.adInGame=gameOnly.adInGame||cfg.adInGame||'';
+      cfg.adGameOver=gameOnly.adGameOver||cfg.adGameOver||'';
+      cfg.adReward=gameOnly.adReward||cfg.adReward||'';
+      localStorage.setItem('cubeCfg',JSON.stringify(cfg));
+    }
+    loadAdminFields();loadWeeklyAdmin();loadReferralAdmin();loadPaymentConfig();renderLevelConfigs();renderAdminBonus();
+  }catch(e){console.warn('Cloud admin load:',e);toast('Cloud load error: '+(e.message||'unknown error'))}
+}
+async function saveProfile(){
+  let n=document.getElementById('editProfileName').value.trim(),c=document.getElementById('editProfileContact').value.trim();
+  if(n)profile.name=n;
+  if(c)profile.contact=c;
+  saveLocalOnly();
+  if(supabaseClient){
+    const {data:{user}}=await supabaseClient.auth.getUser();
+    if(user){
+      const {error}=await supabaseClient.from('profiles').update({username:profile.name}).eq('id',user.id);
+      if(error)return toast('Profile save failed: '+error.message);
+    }
+  }
+  update();toast('Profile saved');
+}
+function loadProfileForm(){let n=document.getElementById('editProfileName'),c=document.getElementById('editProfileContact'),st=document.getElementById('referralStatus');if(n)n.value=profile.name;if(c)c.value=profile.contact;if(st)st.textContent=profile.referralUsed?'Referral reward already used.':'Use one referral code.'}
+function copyReferralCode(){let code=profile.referralCode;if(navigator.clipboard){navigator.clipboard.writeText(code).then(()=>toast('Referral code copied')).catch(()=>toast(code))}else toast(code)}
+function applyReferral(){let code=(document.getElementById('referralInput').value||'').trim().toUpperCase();if(profile.referralUsed)return toast('Referral already used');if(!code)return toast('Enter referral code');if(code===profile.referralCode)return toast('You cannot use your own code');profile.referralUsed=true;let reward=Number(cfg.newUserReferralCoins??50);S.coins+=reward;save();loadProfileForm();modal(`<h2 class="success">REFERRAL APPLIED</h2><div class="rewardCoins">🪙 +${reward}</div><p>New user referral reward added.</p><button class="btn green" onclick="closeModal()">DONE</button>`)}
+function saveAppSettings(){appSettings.sound=document.getElementById('soundToggle').checked;appSettings.vibration=document.getElementById('vibrationToggle').checked;appSettings.dark=document.getElementById('darkToggle').checked;save();toast('Settings saved')}
+function loadAppSettings(){let a=document.getElementById('soundToggle'),b=document.getElementById('vibrationToggle'),c=document.getElementById('darkToggle');if(a)a.checked=appSettings.sound;if(b)b.checked=appSettings.vibration;if(c)c.checked=appSettings.dark}
+function resetGameData(){if(!confirm('Reset coins, score and level?'))return;S.coins=0;S.best=0;S.level=1;S.score=0;S.bonusDay=0;S.lastBonus='';save();toast('Game data reset')}
+async function logoutUser(){await signOutUser()}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const aid=document.getElementById('adminId');
+  const ap=document.getElementById('adminPass');
+  [aid,ap].forEach(el=>{if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')adminLogin()})});
+});
+initSupabase().then(()=>loadCloudPublicData());update();renderBonus();setTimeout(async()=>{if(supabaseClient){const {data:{session}}=await supabaseClient.auth.getSession();if(session)setCloudStatus('☁ Signed in')}} ,250);renderAdminBonus();syncWalletSettings();toggleWithdrawFields();renderWithdrawalHistory();
+</script>
+</body>
+</html>
