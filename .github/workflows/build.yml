@@ -33,28 +33,18 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Extract Cube Dash project
+      - name: Extract Android Project
         run: |
           mkdir -p project
           unzip -o Cube_Dash_Final_AdMob_Package.zip -d project
-find project -path "*/app/src/main/assets/index.html" -type f -exec cp index.html {} \;
-echo "Updated APK HTML with latest index.html"
 
-
-      - name: Find Android project
+      - name: Replace Game HTML
         run: |
-          SETTINGS=$(find project -name settings.gradle -type f | head -1)
-          if [ -z "$SETTINGS" ]; then
-            echo "ERROR: settings.gradle nahi mila"
-            find project -maxdepth 4 -type f | head -100
-            exit 1
-          fi
-          PROJECT_DIR=$(dirname "$SETTINGS")
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-          echo "Android project: $PROJECT_DIR"
+          find project -path "*/app/src/main/assets/index.html" -type f -exec cp index.html {} \;
 
       - name: Build APK
         run: |
+          PROJECT_DIR=$(dirname "$(find project -name settings.gradle -type f | head -1)")
           cd "$PROJECT_DIR"
           gradle assembleDebug --no-daemon
 
@@ -62,4 +52,4 @@ echo "Updated APK HTML with latest index.html"
         uses: actions/upload-artifact@v4
         with:
           name: Cube-Dash-APK
-          path: "${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk"
+          path: "project/**/app/build/outputs/apk/debug/*.apk"
