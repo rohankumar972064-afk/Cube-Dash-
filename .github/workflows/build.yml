@@ -37,6 +37,9 @@ jobs:
         run: |
           mkdir -p project
           unzip -o Cube_Dash_Final_AdMob_Package.zip -d project
+find project -path "*/app/src/main/assets/index.html" -type f -exec cp index.html {} \;
+echo "Updated APK HTML with latest index.html"
+
 
       - name: Find Android project
         run: |
